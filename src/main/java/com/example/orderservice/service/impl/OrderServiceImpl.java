@@ -11,6 +11,9 @@ import com.example.orderservice.service.OrderService;
 import feign.FeignException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -44,5 +47,26 @@ public class OrderServiceImpl  implements OrderService {
         OrderEntity entity = orderMapper.toEntity(request);
         var dbEntity = orderRepository.save(entity);
         return orderMapper.toResponse(dbEntity);
+    }
+
+    @Override
+    public OrderResponse getOrderById(Long id) {
+        OrderEntity orderEntity = orderRepository.findById(id).orElseThrow(
+                ()-> new RuntimeException("Order not found by id: " +id));
+
+        return orderMapper.toResponse(orderEntity);
+    }
+
+    @Override
+    public Page<OrderResponse> getAllOrder(Pageable pageable) {
+        return orderRepository.findAll(pageable)
+                .map(orderMapper::toResponse);
+    }
+
+    @Override
+    public Page<OrderResponse> getAllOrderByUserId(Long id, Pageable pageable) {
+
+        return orderRepository.findByUserId(id,pageable)
+                .map(orderMapper::toResponse);
     }
 }
