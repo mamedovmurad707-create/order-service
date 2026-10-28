@@ -1,5 +1,6 @@
 package com.example.orderservice.model.response;
 
+import com.example.orderservice.constant.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,6 +21,6 @@ public class OrderResponse {
     private Integer quantity;
     private BigDecimal unitPrice;
     private BigDecimal totalPrice;
-    private String status;
+    private OrderStatus status;
     private Instant createdAt;
 }

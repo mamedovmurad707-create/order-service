@@ -1,5 +1,6 @@
 package com.example.orderservice.mapper;
 
+import com.example.orderservice.constant.OrderStatus;
 import com.example.orderservice.entity.OrderEntity;
 import com.example.orderservice.model.request.OrderRequest;
 import com.example.orderservice.model.response.OrderResponse;
@@ -19,7 +20,7 @@ public class OrderMapper {
                         .multiply(BigDecimal.valueOf(request.getQuantity()))
         );
         entity.setUnitPrice(request.getUnitPrice());
-        entity.setStatus("NEW");
+        entity.setStatus(OrderStatus.NEW);
         return entity;
     }
 

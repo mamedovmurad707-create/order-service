@@ -2,9 +2,12 @@ package com.example.orderservice.service.impl;
 
 import com.example.orderservice.client.UserClient;
 import com.example.orderservice.client.dto.UserResponse;
+import com.example.orderservice.constant.OrderStatus;
 import com.example.orderservice.entity.OrderEntity;
 import com.example.orderservice.mapper.OrderMapper;
+import com.example.orderservice.model.request.OrderChangeStatusRequest;
 import com.example.orderservice.model.request.OrderRequest;
+import com.example.orderservice.model.request.OrderUpdateRequest;
 import com.example.orderservice.model.response.OrderResponse;
 import com.example.orderservice.repository.OrderRepository;
 import com.example.orderservice.service.OrderService;
@@ -17,6 +20,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.math.BigDecimal;
 
 @Service
 @RequiredArgsConstructor
@@ -68,5 +73,47 @@ public class OrderServiceImpl  implements OrderService {
 
         return orderRepository.findByUserId(id,pageable)
                 .map(orderMapper::toResponse);
+    }
+
+    @Override
+    public OrderResponse updateOrderById(Long id, OrderUpdateRequest request) {
+
+       OrderEntity entity =  orderRepository.findById(id).orElseThrow(()->
+                new ResponseStatusException(HttpStatus.NOT_FOUND,"Order not found id= " +id));
+       if (entity.getStatus()!= OrderStatus.NEW) {
+        throw  new ResponseStatusException(HttpStatus.CONFLICT,"Only NEW orders can be updated");
+       }
+           entity.setProductName(request.getProductName());
+           entity.setQuantity(request.getQuantity());
+           entity.setUnitPrice(request.getUnitPrice());
+           entity.setTotalPrice(
+                   request.getUnitPrice()
+                           .multiply(BigDecimal.valueOf(request.getQuantity()))
+           );
+       orderRepository.save(entity);
+        return orderMapper.toResponse(entity);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+      OrderEntity entity =  orderRepository.findById(id).orElseThrow(()->
+                new ResponseStatusException(HttpStatus.NOT_FOUND,"Order not found by id: "+id));
+      entity.setStatus(OrderStatus.CANCELED);
+      orderRepository.save(entity);
+    }
+
+    @Override
+    public String changeStatusById(Long id, OrderChangeStatusRequest request) {
+       OrderEntity orderEntity = orderRepository.findById(id).orElseThrow(()->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found by id: "+id));
+       if (orderEntity.getStatus() != OrderStatus.NEW){
+           throw new ResponseStatusException(HttpStatus.CONFLICT,"Only NEW status order can changed");
+       }
+       if (request.getStatus() == OrderStatus.NEW){
+            throw  new ResponseStatusException(HttpStatus.CONFLICT, "Order already has a NEW status");
+       }
+       orderEntity.setStatus(request.getStatus());
+       orderRepository.save(orderEntity);
+        return orderEntity.getStatus().toString();
     }
 }
