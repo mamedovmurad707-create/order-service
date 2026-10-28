@@ -68,7 +68,7 @@ public class OrderController {
         return ResponseEntity.ok(" Order canceled");
     }
     @PatchMapping("/{id}/status")
-    public ResponseEntity<String> changeStatusById(@PathVariable Long id, @RequestBody OrderChangeStatusRequest request){
+    public ResponseEntity<String> changeStatusById(@PathVariable Long id, @RequestBody @Valid OrderChangeStatusRequest request){
       String status = orderService.changeStatusById(id,request);
       return ResponseEntity.ok(status);
     }
