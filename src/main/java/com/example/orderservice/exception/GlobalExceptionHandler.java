@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.LinkedHashMap;
@@ -21,10 +22,24 @@ public class GlobalExceptionHandler {
         error.setTimestamp(Instant.now());
         error.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
         error.setError(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
-        error.setMessage(error.getMessage());
+        error.setMessage(e.getMessage());
         error.setPath(request.getRequestURI());
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(error);
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<ApiError> handleResponseStatusException(ResponseStatusException e, HttpServletRequest request){
+        HttpStatus status = HttpStatus.valueOf(e.getStatusCode().value());
+        ApiError error = new ApiError();
+        error.setTimestamp(Instant.now());
+        error.setStatus(status.value());
+        error.setError(status.getReasonPhrase());
+        error.setMessage(e.getReason());
+        error.setPath(request.getRequestURI());
+        return ResponseEntity
+                .status(status)
                 .body(error);
     }
 
@@ -69,7 +84,7 @@ public class GlobalExceptionHandler {
         ApiError error = new ApiError();
         error.setTimestamp(Instant.now());
         error.setStatus(HttpStatus.CONFLICT.value());
-        error.setError(HttpStatus.CONTINUE.getReasonPhrase());
+        error.setError(HttpStatus.CONFLICT.getReasonPhrase());
         error.setMessage(e.getMessage());
         error.setPath(request.getRequestURI());
         return ResponseEntity

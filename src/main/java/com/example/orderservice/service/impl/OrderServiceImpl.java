@@ -1,6 +1,5 @@
 package com.example.orderservice.service.impl;
 
-import com.example.orderservice.client.UserClient;
 import com.example.orderservice.client.dto.UserResponse;
 import com.example.orderservice.constant.OrderStatus;
 import com.example.orderservice.entity.OrderEntity;
@@ -33,9 +32,9 @@ import java.math.BigDecimal;
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
-    private final UserClient userClient;
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
+    private final UserClientService userClientService;
 
     @Override
     @Transactional
@@ -43,7 +42,7 @@ public class OrderServiceImpl implements OrderService {
         log.info("OrderServiceImpl.createOrder.start");
         UserResponse userResponse;
         try {
-            userResponse = userClient.getUserById(request.getUserId());
+            userResponse = userClientService.getUserById(request.getUserId());
         } catch (FeignException.FeignClientException e) {
             log.error("OrderServiceImpl.createOrder.error userId: {}",request.getUserId());
             throw new CustomerNotFoundException(
