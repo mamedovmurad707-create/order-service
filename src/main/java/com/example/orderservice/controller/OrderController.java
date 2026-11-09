@@ -6,6 +6,8 @@ import com.example.orderservice.model.request.OrderRequest;
 import com.example.orderservice.model.request.OrderUpdateRequest;
 import com.example.orderservice.model.response.OrderResponse;
 import com.example.orderservice.service.OrderService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,26 +29,33 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/order")
+@Tag(name = "Order API", description = "Order management APIs")
 public class OrderController {
     private final OrderService orderService;
+
+    @Operation(summary = "Create new order")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public OrderResponse create(@RequestBody @Valid OrderRequest request){
         return orderService.createOrder(request);
     }
 
+    @Operation(summary = "Get  order by id")
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<OrderResponse> getById(@PathVariable Long id){
        OrderResponse response = orderService.getOrderById(id);
         return ResponseEntity.ok(response);
     }
+
+    @Operation(summary = "Get all orders with pagination")
     @GetMapping
     public ResponseEntity<Page<OrderResponse>>  getAll(@PageableDefault(page = 0,size = 5) Pageable pageable){
        var orderEntityPage = orderService.getAllOrder(pageable);
         return ResponseEntity.ok(orderEntityPage);
     }
 
+    @Operation(summary = "Get all orders with pagination by User")
     @GetMapping("/allOrder/{userId}")
     public ResponseEntity<Page<OrderResponse>> getAllOrderByUserId(@PathVariable(name = "userId") Long id ,
                                                                    @PageableDefault(size = 7) Pageable pageable){
@@ -54,6 +63,7 @@ public class OrderController {
        return ResponseEntity.ok(userOrders);
     }
 
+    @Operation(summary = "Update order")
     @PutMapping("/{id}")
     public ResponseEntity<OrderResponse> updateOrderById(@PathVariable Long id,
                                                      @RequestBody @Valid OrderUpdateRequest request){
@@ -61,12 +71,13 @@ public class OrderController {
 
         return ResponseEntity.ok(order);
     }
-
+    @Operation(summary = "Delete order by id means canceled")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteById(@PathVariable Long id){
        orderService.deleteById(id);
         return ResponseEntity.ok(" Order canceled");
     }
+    @Operation(summary = "Update order status by id")
     @PatchMapping("/{id}/status")
     public ResponseEntity<String> changeStatusById(@PathVariable Long id, @RequestBody @Valid OrderChangeStatusRequest request){
       String status = orderService.changeStatusById(id,request);
