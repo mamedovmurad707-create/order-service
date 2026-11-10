@@ -47,3 +47,8 @@ resilience4j:
 clients:
   user-service:
     url: http://localhost:8080
+
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration: 3600000

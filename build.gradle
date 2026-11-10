@@ -44,6 +44,8 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.0'
     //security
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    //jwt
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 }
 
 dependencyManagement {

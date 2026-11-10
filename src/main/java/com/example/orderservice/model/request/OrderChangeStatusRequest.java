@@ -1,7 +1,7 @@
 package com.example.orderservice.model.request;
 
 import com.example.orderservice.constant.OrderStatus;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class OrderChangeStatusRequest {
-    @NotBlank
+    @NotNull
     private OrderStatus status;
 }

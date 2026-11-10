@@ -32,6 +32,8 @@ services:
       SPRING_DATASOURCE_PASSWORD: postgres
       # user-service host-da (my_user_app konteyneri, 8080) işləyir
       CLIENTS_USER_SERVICE_URL: http://host.docker.internal:8080
+      # host-dakı JWT_SECRET env dəyişəni konteynerə ötürülür
+      JWT_SECRET: ${JWT_SECRET}
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
